@@ -11,6 +11,11 @@ module.exports = {
     '@src/(.*)': '<rootDir>/src/$1',
     '@test/(.*)': '<rootDir>/test/$1',
   },
+  transform: {
+    '^.+\\.ts?$': 'ts-jest',
+    '^.+\\.(js|jsx|ts|tsx|mjs)$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['node_modules/(?!(axios)/)'],
 };
 
 

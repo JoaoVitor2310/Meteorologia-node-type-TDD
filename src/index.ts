@@ -8,7 +8,6 @@ console.log('test');
 // app.use(express.json());
 // app.use(express.urlencoded({extended: false}));
 
-
 // // Routes
 // import router from '../routes/Router';
 // app.use('/api', router);
