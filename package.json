@@ -10,7 +10,7 @@
     "start:dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only --ignore-watch node_modules --no-notify ./src/index.ts",
     "test": "jest --forceExit --maxWorkers=1",
     "test:functional": "jest --projects ./test --runInBand",
-    "test:unit": "jest --projects",
+    "test:unit": "jest",
     "lint": "eslint ./src ./test --ext .ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
     "style:check": "prettier --check ./src/**/*.ts ./test/**/*.ts",

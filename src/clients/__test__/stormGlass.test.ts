@@ -8,13 +8,13 @@ jest.mock('axios'); // Iremos "mockar" o axios. Isso significa que iremos simula
 describe('StormGlass client', () => {
     const mockedAxios = axios as jest.Mocked<typeof axios>; // Mocked é uma classe  do jest. Aqui o mockedAxios recebe os tipos do jest e do axios. O "as" é uma forçada do typescript, não se preocupe.
     it('Should return the normalizes forecast form the StormGlass service', async () => { // Vamos pegar os dados da API e tratar eles para serem utilzados
-        const lat = -33.792726;
+        const lat = -33.792726; // Parâmetros para mandar pra API
         const lng = 151.289824;
 
-        mockedAxios.get.mockResolvedValue({data: stornGlassWeather3HoursFixture}); // O retorno simulado do axios será um objeto vazio
+        mockedAxios.get.mockResolvedValue({data: stornGlassWeather3HoursFixture}); // O retorno simulado do axios será um objeto com data que definimos na pasta fixture
 
-        const stormGlass = new StormGlass(mockedAxios);
-        const response = await stormGlass.fetchPoints(lat, lng);
+        const stormGlass = new StormGlass(mockedAxios); // Instância da classe
+        const response = await stormGlass.fetchPoints(lat, lng); // Requisição será feita de dentro da classe criada.
         expect(response).toEqual(stornGlassNormalized3HoursFixture);
     })
 });
