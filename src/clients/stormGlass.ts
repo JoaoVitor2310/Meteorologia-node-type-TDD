@@ -1,4 +1,6 @@
-import { AxiosStatic } from "axios";
+import { InternalError } from "@src/util/errors/internal-error";
+import config, {IConfig} from 'config';
+import * as HTTPUtil from '@src/util/request';
 
 // PARA ENTENDER MELHOR AS INTERFACES, É ACONSELHADO LER DA ÚLTIMA ATÉ A PRIMEIRA!
 
@@ -33,25 +35,47 @@ export interface ForecastPoint { // Interface que será o tipo normalizado que i
     windSpeed: number;
 }
 
+export class ClientRequestError extends InternalError{ // Tratando o erro quando ele é no client, antes de chegar no serviço
+    constructor(message: string){
+        const internalMessage = 'Unexpected error when trying to communicate to StormGlass:';
+        super(`${internalMessage} ${message}`);
+    }
+}
+
+export class StormGlassResponseError extends InternalError {
+    constructor(message: string){
+        const internalMessage = 'Unexpected error returned by the StormGlass service';
+        super(`${internalMessage}: ${message}`)
+    }
+}
+
+const stormGlassResourceConfig: IConfig = config.get('App.resources.StormGlass'); // Biblioteca config
+
 export class StormGlass {
     readonly stormGlassApiParams = 'swellDirection,swellHeight,swellPeriod,waveDirection,waveHeight,windDirection,windSpeed'; // Dados não dinâmicos que iremos mandar na url e voltará na resposta 
     readonly stormGlassApiSource = 'noaa';
 
     // Quando essa classe é iniciada, tem que passar um request para ela.
-    constructor(protected request: AxiosStatic) { } // AxiosStatic é um tipo do axios, que diz que qnd iniciar a classe, tirá que passar um axios para ela 
+    constructor(protected request = new HTTPUtil.Request()) { } // AxiosStatic é um tipo do axios, que diz que qnd iniciar a classe, tirá que passar um axios para ela 
 
     public async fetchPoints(lat: number, lng: number): Promise<ForecastPoint[]> { // Método que irá fazer as requisições na API
-        const response = await this.request.get<StormGlassForecastResponse>(`https://api.stormglass.io/v2/weather/point?params=${this.stormGlassApiParams}&source=${this.stormGlassApiSource}&end=15921138026&lat=${lat}&lng=${lng}`, 
-        {
-            headers: { // Só para não esquecer de colocar o token depois.
-                Authorization: 'fake-token',
-              },
-        });
-
-        return this.normalizedResponse(response.data)
+        try {
+            const response = await this.request.get<StormGlassForecastResponse>(`${stormGlassResourceConfig.get('apiUrl')}/weather/point?params=${this.stormGlassApiParams}&source=${this.stormGlassApiSource}&end=15921138026&lat=${lat}&lng=${lng}`,
+                {
+                    headers: { // Só para não esquecer de colocar o token depois.
+                        Authorization: stormGlassResourceConfig.get('apiToken'),
+                    },
+                });
+            return this.normalizedResponse(response.data);
+        } catch(err) {
+            if(HTTPUtil.Request.isRequestError(err)){ // Se o error for por causa do serviço, terá essas propriedades
+                throw new StormGlassResponseError(`Error: ${JSON.stringify(err.response.data)} Code: ${err.response.status}`)
+            }
+            throw new ClientRequestError(err.message);
+        }
     }
 
-      
+
     private normalizedResponse(points: StormGlassForecastResponse): ForecastPoint[] { // Gera resposta normalizada, recebe o points da API e retorna array ForecastPoint 
         // Iremos checar se os pontos são validos com a isValidPoints
         return points.hours.filter(this.isValidPoints.bind(this)).map((point) => ({ // O bind redefine o this, nesse caso ele diz que se refere a classe StormGlass, se não passasse, o this seria undefined.
