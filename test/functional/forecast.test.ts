@@ -1,11 +1,11 @@
 describe('Beach forecast functional tests', () => {
-  it('should return a forecast with just a few times', async () => {
+  it('should return a forecast with just a few times', async () => { // Forecast é previsão
     const { body, status } = await global.testRequest.get('/forecast'); // Faz uma requisição na nossa api
     expect(status).toBe(200);
     expect(body).toEqual([
       {
         // Resposta pronta que colocamos aqui e no teste como exemplo e testar o servidor
-        time: '2020-04-26T00:00:00+00:00',
+        time: '2020-04-26T00:00:00+00:00', // 1ª previsão, com os dados abaixo
         forecast: [
           {
             lat: -33.792726,
@@ -24,7 +24,7 @@ describe('Beach forecast functional tests', () => {
         ],
       },
       {
-        time: '2020-04-26T01:00:00+00:00',
+        time: '2020-04-26T01:00:00+00:00', // 2ª previsão, com os dados abaixo
         forecast: [
           {
             lat: -33.792726,

@@ -6,12 +6,12 @@ import stornGlassNormalized3HoursFixture from '@test/fixtures/stormglass_normali
 jest.mock('@src/util/request'); // Iremos "mockar" o axios. Isso significa que iremos simular um comportamento a partir dele
 
 describe('StormGlass client', () => {
-    // const mockedAxios = axios as jest.Mocked<typeof axios>; // Mocked é uma classe  do jest. Aqui o mockedAxios recebe os tipos do jest e do axios. O "as" é uma forçada do typescript, não se preocupe.
+    // const mockedAxios = axios as jest.Mocked<typeof axios>; // Mocked é uma classe  do jest. Aqui o mockedAxios recebe os tipos do jest e do axios. O "as" é uma forçada do typescript para tipar, não se preocupe.
     const mockedRequest = new HTTPUtil.Request as jest.Mocked<HTTPUtil.Request>; //
     
     const MockedRequestClass = HTTPUtil.Request as jest.Mocked<typeof HTTPUtil.Request>;
     
-    it('Should return the normalizes forecast form the StormGlass service', async () => { // Vamos pegar os dados da API e tratar eles para serem utilzados
+    it('Should return the normalizes forecast form the StormGlass service', async () => { // Vamos pegar os dados da API e tratar eles para serem utilizados
         const lat = -33.792726; // Parâmetros para mandar pra API
         const lng = 151.289824;
 

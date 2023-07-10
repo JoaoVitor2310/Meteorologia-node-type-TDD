@@ -1,3 +1,6 @@
+
+// VOLTAR NA AULA 1 DO CAPÍTULO 2 PARA ENTENDER E COMENTAR
+
 import * as path from 'path';
 import moduleAlias from 'module-alias';
 

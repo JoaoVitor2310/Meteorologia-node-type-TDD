@@ -1,3 +1,5 @@
+// Controller de previsões do tempo
+
 import { Controller, Get } from '@overnightjs/core'; // Overnight ajuda a utilizar o express com typescrit
 import { Request, Response } from 'express';
 
