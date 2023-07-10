@@ -38,14 +38,15 @@ export interface ForecastPoint { // Interface que será o tipo normalizado que i
     windSpeed: number;
 }
 
-export class ClientRequestError extends InternalError{ // Tratando o erro quando ele é no client, antes de chegar no serviço
-    constructor(message: string){
+export class ClientRequestError extends InternalError{ // Tratando o erro quando ele é no client, antes de chegar no serviço. Estende a classe genérica de erro que criamos
+    constructor(message: string){ // Recebe uma mensagem
         const internalMessage = 'Unexpected error when trying to communicate to StormGlass:';
         super(`${internalMessage} ${message}`);
-    }
+    } // Envia a msg de erro concatenada com a mensagem recebida do client
 }
 
-export class StormGlassResponseError extends InternalError {
+export class StormGlassResponseError extends InternalError { // Erro de resposta devolvido pelo serviço. Estende a classe genérica de erro que criamos
+    // OBS: Iremos enviar o erro 500 por ser um erro da aplicação e não do usuário, 
     constructor(message: string){
         const internalMessage = 'Unexpected error returned by the StormGlass service';
         super(`${internalMessage}: ${message}`)
@@ -59,7 +60,7 @@ export class StormGlass {
     readonly stormGlassApiSource = 'noaa';
 
     // Quando essa classe é iniciada, tem que passar um request para ela.
-    constructor(protected request = new HTTPUtil.Request()) { } // AxiosStatic é um tipo do axios, que diz que qnd iniciar a classe, tirá que passar um axios para ela 
+    constructor(protected request = new HTTPUtil.Request()) { } // AxiosStatic é um tipo do axios, que diz que qnd iniciar a classe, terá que passar um axios para ela 
 
     public async fetchPoints(lat: number, lng: number): Promise<ForecastPoint[]> { // Método que irá fazer as requisições na API e retornar normalizado
         try {
@@ -74,7 +75,7 @@ export class StormGlass {
             if(HTTPUtil.Request.isRequestError(err)){ // Se o error for por causa do serviço, terá essas propriedades
                 throw new StormGlassResponseError(`Error: ${JSON.stringify(err.response.data)} Code: ${err.response.status}`)
             }
-            throw new ClientRequestError(err.message);
+            throw new ClientRequestError(err.message); // Se o erro for por conta do client
         }
     }
 
