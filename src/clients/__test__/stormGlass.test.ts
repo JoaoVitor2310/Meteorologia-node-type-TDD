@@ -1,4 +1,4 @@
-import * as HTTPUtil from '@src/util/request';
+import * as HTTPUtil from '@src/util/request'; // Importação do nosso request para implementar o axios
 import { StormGlass } from '@src/clients/stormGlass';
 import stornGlassWeather3HoursFixture from '@test/fixtures/stormglass_weather_3_hours_fixture.json'; // Arquivo de exemplo de resposta da api para utilizar nos testes
 import stornGlassNormalized3HoursFixture from '@test/fixtures/stormglass_normalized_response_3_hours.json'; // Arquivo de exemplo, mas agora normalizado(no formato que a gente quer)
@@ -7,9 +7,9 @@ jest.mock('@src/util/request'); // Iremos "mockar" o axios. Isso significa que i
 
 describe('StormGlass client', () => {
     // const mockedAxios = axios as jest.Mocked<typeof axios>; // Mocked é uma classe  do jest. Aqui o mockedAxios recebe os tipos do jest e do axios. O "as" é uma forçada do typescript para tipar, não se preocupe.
-    const mockedRequest = new HTTPUtil.Request as jest.Mocked<HTTPUtil.Request>; //
+    const mockedRequest = new HTTPUtil.Request() as jest.Mocked<HTTPUtil.Request>; //Instância do axios tipada, por isso nao precisa do typeof
     
-    const MockedRequestClass = HTTPUtil.Request as jest.Mocked<typeof HTTPUtil.Request>;
+    const MockedRequestClass = HTTPUtil.Request as jest.Mocked<typeof HTTPUtil.Request>; // 
     
     it('Should return the normalizes forecast form the StormGlass service', async () => { // Vamos pegar os dados da API e tratar eles para serem utilizados
         const lat = -33.792726; // Parâmetros para mandar pra API
@@ -67,7 +67,7 @@ describe('StormGlass client', () => {
           }
         }
 
-        MockedRequestClass.isRequestError.mockReturnValue(true);
+        MockedRequestClass.isRequestError.mockReturnValue(true); // Utilizando a classe estática para mocker o erro de request
     
         mockedRequest.get.mockRejectedValue(
           new FakeAxiosError({

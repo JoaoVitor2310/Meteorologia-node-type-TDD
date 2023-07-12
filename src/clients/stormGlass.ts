@@ -2,7 +2,7 @@
 
 import { InternalError } from "@src/util/errors/internal-error";
 import config, {IConfig} from 'config';
-import * as HTTPUtil from '@src/util/request';
+import * as HTTPUtil from '@src/util/request'; // Importação do nosso request para implementar o axios
 
 // PARA ENTENDER MELHOR AS INTERFACES, É ACONSELHADO LER DA ÚLTIMA ATÉ A PRIMEIRA!
 // É utilizado interfaces ao invés de tipos pq são melhores para tipar shapes de objetos e tbm podem estender
@@ -53,26 +53,26 @@ export class StormGlassResponseError extends InternalError { // Erro de resposta
     }
 }
 
-const stormGlassResourceConfig: IConfig = config.get('App.resources.StormGlass'); // Biblioteca config
+const stormGlassResourceConfig: IConfig = config.get('App.resources.StormGlass'); // Biblioteca config para pegar a nossa url, semelhante ao .env. Esse tipo é genérico, e é tipo chave: valor
 
 export class StormGlass {
     readonly stormGlassApiParams = 'swellDirection,swellHeight,swellPeriod,waveDirection,waveHeight,windDirection,windSpeed'; // Dados não dinâmicos que iremos mandar na url e voltará na resposta 
     readonly stormGlassApiSource = 'noaa';
 
     // Quando essa classe é iniciada, tem que passar um request para ela.
-    constructor(protected request = new HTTPUtil.Request()) { } // AxiosStatic é um tipo do axios, que diz que qnd iniciar a classe, terá que passar um axios para ela 
+    constructor(protected request = new HTTPUtil.Request()) { } // A classe vai receber o nosso axios
 
     public async fetchPoints(lat: number, lng: number): Promise<ForecastPoint[]> { // Método que irá fazer as requisições na API e retornar normalizado
         try {
             const response = await this.request.get<StormGlassForecastResponse>(`${stormGlassResourceConfig.get('apiUrl')}/weather/point?params=${this.stormGlassApiParams}&source=${this.stormGlassApiSource}&end=15921138026&lat=${lat}&lng=${lng}`, // Faz a requisição, e espera uma resposta do tipo que criamos na interface lá em cima
                 {
                     headers: { // Só para não esquecer de colocar o token depois.
-                        Authorization: stormGlassResourceConfig.get('apiToken'),
+                        Authorization: stormGlassResourceConfig.get('apiToken'), // Pega o token através do json da biblioteca config
                     },
                 });
             return this.normalizedResponse(response.data);
         } catch(err) {
-            if(HTTPUtil.Request.isRequestError(err)){ // Se o error for por causa do serviço, terá essas propriedades
+            if(HTTPUtil.Request.isRequestError(err)){ // Se o erro for por causa do serviço, terá essas propriedades
                 throw new StormGlassResponseError(`Error: ${JSON.stringify(err.response.data)} Code: ${err.response.status}`)
             }
             throw new ClientRequestError(err.message); // Se o erro for por conta do client
